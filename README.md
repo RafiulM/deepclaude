@@ -10,16 +10,43 @@ you interactively if you haven't included it yet), and from then on just run
 > Requires the `claude` CLI to already be installed
 > ([instructions](https://docs.claude.com/en/docs/claude-code)).
 
+## Full guide
+
+For a more detailed walkthrough — what Claude Code and DeepSeek are, how the
+model mapping works, and step-by-step install/config/troubleshooting — see:
+
+- [guide_en.md](guide_en.md) — English
+- [guide_id.md](guide_id.md) — Bahasa Indonesia
+
 ## Install (one command)
 
 ### macOS / Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RafiulM/deepclaude/main/install.sh | bash
+curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/RafiulM/deepclaude/main/install.sh | bash
+```
+
+If GitHub's raw content CDN returns a `429` (rate limited), use the jsDelivr mirror instead:
+
+```bash
+curl -fsSL https://cdn.jsdelivr.net/gh/RafiulM/deepclaude@main/install.sh | bash
 ```
 
 Installs a single `deepclaude` script into `~/.local/bin`. If that directory
 isn't on your `PATH`, the installer prints the line to add.
+
+#### About the `429` error
+
+`raw.githubusercontent.com` occasionally rate-limits requests (`curl: (56)
+... 429`), especially from shared/corporate IPs. This is intermittent, not
+permanent — the same request can succeed a minute later. To handle it,
+`install.sh` retries automatically (`curl --retry 3 --retry-delay 2
+--retry-all-errors`) and, if that still fails, falls back to the
+`cdn.jsdelivr.net` mirror. This applies both to the `deepclaude` binary the
+script downloads and to the bootstrap step that fetches `install.sh` itself
+(used by `deepclaude update` and the one-liner above), so a 429 on either
+side no longer breaks the install. If you still hit it after that, just
+re-run the command, or use the jsDelivr one-liner directly (see above).
 
 ### Windows (PowerShell)
 
@@ -73,6 +100,9 @@ deepclaude reset             # delete the stored key
 ```bash
 deepclaude update    # pull the latest version (re-runs the installer)
 ```
+
+Uses the same retry-then-jsDelivr-fallback behavior as the installer, so a
+transient `429` from `raw.githubusercontent.com` won't block the update.
 
 | Platform        | Where the key is stored                          |
 | --------------- | ------------------------------------------------ |
