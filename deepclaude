@@ -105,7 +105,8 @@ case "${1:-}" in
     ;;
   update|--update|upgrade|--upgrade)
     say "Updating deepclaude to the latest version..."
-    curl -fsSL "https://raw.githubusercontent.com/RafiulM/deepclaude/main/install.sh" | bash
+    (curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors "https://raw.githubusercontent.com/RafiulM/deepclaude/main/install.sh" \
+      || curl -fsSL "https://cdn.jsdelivr.net/gh/RafiulM/deepclaude@main/install.sh") | bash
     exit $?
     ;;
 esac
